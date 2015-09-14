@@ -9,7 +9,9 @@
 #import "RKSearchWordEntity.h"
 
 NSString * const RKSearchWordEntityName = @"RKSearchWord";
-NSString * const RKSearchWordAttributeName = @"word";
+NSString * const RKSearchWordTokenAttributeName = @"word";
+NSString * const RKSearchWordOriginalWordAttributeName = @"originalWord";
+
 NSString * const RKSearchWordsRelationshipName = @"searchWords";
 
 @implementation RKSearchWordEntity
@@ -20,11 +22,15 @@ NSString * const RKSearchWordsRelationshipName = @"searchWords";
     if (self) {
         [self setName:RKSearchWordEntityName];
         [self setManagedObjectClassName:RKSearchWordEntityName];
-        NSAttributeDescription *attribute = [[NSAttributeDescription alloc] init];
-        [attribute setName:RKSearchWordAttributeName];
-        [attribute setIndexed:YES];
-        [attribute setAttributeType:NSStringAttributeType];
-        [self setProperties:@[attribute]];
+        NSAttributeDescription *tokenAttribute = [[NSAttributeDescription alloc] init];
+        [tokenAttribute setName:RKSearchWordTokenAttributeName];
+        [tokenAttribute setIndexed:YES];
+        [tokenAttribute setAttributeType:NSStringAttributeType];
+        NSAttributeDescription *originalWordAttribute = [[NSAttributeDescription alloc] init];
+        [originalWordAttribute setName:RKSearchWordOriginalWordAttributeName];
+        [originalWordAttribute setIndexed:YES];
+        [originalWordAttribute setAttributeType:NSStringAttributeType];
+        [self setProperties:@[tokenAttribute, originalWordAttribute]];
     }
 
     return self;

@@ -10,15 +10,17 @@
 
 @implementation RKStringTokenizer
 
-- (NSSet *)tokenize:(NSString *)string
-{
+- (NSSet *)tokenize:(NSString *)string {
+    NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[[NSLocale preferredLanguages] objectAtIndex:0]];
+    return [self tokenize:string forLocale:locale foldString:YES];
+}
+
+- (NSSet *)tokenize:(NSString *)string forLocale:(NSLocale *)locale foldString:(BOOL)foldString {
     NSMutableSet *tokens = [NSMutableSet set];
 
-    CFLocaleRef locale = CFLocaleCopyCurrent();
-
-    // Remove diacratics and lowercase our input text
-    NSString *tokenizeText = string = [string stringByFoldingWithOptions:kCFCompareCaseInsensitive|kCFCompareDiacriticInsensitive locale:[NSLocale systemLocale]];
-    CFStringTokenizerRef tokenizer = CFStringTokenizerCreate(kCFAllocatorDefault, (__bridge CFStringRef)tokenizeText, CFRangeMake(0, CFStringGetLength((__bridge CFStringRef)tokenizeText)), kCFStringTokenizerUnitWord, locale);
+    // Conditionally remove diacratics and lowercase our input text
+    NSString *tokenizeText = (foldString) ? [string stringByFoldingWithOptions:kCFCompareCaseInsensitive|kCFCompareDiacriticInsensitive locale:locale] : string;
+    CFStringTokenizerRef tokenizer = CFStringTokenizerCreate(kCFAllocatorDefault, (__bridge CFStringRef)tokenizeText, CFRangeMake(0, CFStringGetLength((__bridge CFStringRef)tokenizeText)), kCFStringTokenizerUnitWord, (CFLocaleRef)locale);
     CFStringTokenizerTokenType tokenType = kCFStringTokenizerTokenNone;
 
     while (kCFStringTokenizerTokenNone != (tokenType = CFStringTokenizerAdvanceToNextToken(tokenizer))) {
@@ -31,7 +33,6 @@
     }
 
     CFRelease(tokenizer);
-    CFRelease(locale);
 
     // Remove any stop words
     if (self.stopWords) [tokens minusSet:self.stopWords];

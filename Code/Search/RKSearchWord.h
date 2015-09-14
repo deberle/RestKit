@@ -36,4 +36,7 @@
  */
 @property (nonatomic, strong) NSString *word;
 
+
+@property (nonatomic, strong) NSString *originalWord;
+
 @end

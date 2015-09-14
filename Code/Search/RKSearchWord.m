@@ -28,5 +28,6 @@
 @implementation RKSearchWord
 
 @dynamic word;
+@dynamic originalWord;
 
 @end
