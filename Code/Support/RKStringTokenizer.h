@@ -48,4 +48,6 @@
  */
 - (NSSet *)tokenize:(NSString *)string;
 
+- (NSSet *)tokenize:(NSString *)string forLocale:(NSLocale *)locale foldString:(BOOL)foldString;
+
 @end

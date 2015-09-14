@@ -21,7 +21,8 @@
 #import <CoreData/CoreData.h>
 
 extern NSString * const RKSearchWordEntityName;
-extern NSString * const RKSearchWordAttributeName;
+extern NSString * const RKSearchWordTokenAttributeName;
+extern NSString * const RKSearchWordOriginalWordAttributeName;
 extern NSString * const RKSearchWordsRelationshipName;
 
 /*
