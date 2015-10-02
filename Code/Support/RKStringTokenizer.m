@@ -19,7 +19,7 @@
     NSMutableSet *tokens = [NSMutableSet set];
 
     // Conditionally remove diacratics and lowercase our input text
-    NSString *tokenizeText = (foldString) ? [string stringByFoldingWithOptions:kCFCompareCaseInsensitive|kCFCompareDiacriticInsensitive locale:locale] : string;
+    NSString *tokenizeText = string = (foldString) ? [string stringByFoldingWithOptions:kCFCompareCaseInsensitive|kCFCompareDiacriticInsensitive locale:locale] : string;
     CFStringTokenizerRef tokenizer = CFStringTokenizerCreate(kCFAllocatorDefault, (__bridge CFStringRef)tokenizeText, CFRangeMake(0, CFStringGetLength((__bridge CFStringRef)tokenizeText)), kCFStringTokenizerUnitWord, (CFLocaleRef)locale);
     CFStringTokenizerTokenType tokenType = kCFStringTokenizerTokenNone;
 
