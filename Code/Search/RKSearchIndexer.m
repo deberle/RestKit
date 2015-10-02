@@ -178,6 +178,12 @@ NSString * const RKSearchableAttributeNamesUserInfoKey = @"RestKitSearchableAttr
 
             for (NSString *searchableAttribute in searchableAttributes) {
                 NSString *attributeValue = [managedObject valueForKey:searchableAttribute];
+
+                // Hack: strip html
+                if ([searchableAttribute isEqualToString:@"content"] && attributeValue) {
+                    attributeValue = [self stringByStrippingTagsfromString:attributeValue];
+                }
+
                 id collectionOfStrings = RKObjectIsCollection(attributeValue) ? attributeValue : (attributeValue ? @[attributeValue] : @[]);
                 for (id object in collectionOfStrings) {
                     if ([object isKindOfClass:[NSString class]]) {
@@ -422,4 +428,122 @@ NSString * const RKSearchableAttributeNamesUserInfoKey = @"RestKitSearchableAttr
     }
 }
 
+
+
+
+// Remove newlines and white space from strong
+- (NSString *)stringByRemovingNewLinesAndWhitespaceFromString:(NSString *)string {
+    
+    // Strange New lines:
+    //	Next Line, U+0085
+    //	Form Feed, U+000C
+    //	Line Separator, U+2028
+    //	Paragraph Separator, U+2029
+    
+    // Scanner
+    NSScanner *scanner = [[NSScanner alloc] initWithString:string];
+    [scanner setCharactersToBeSkipped:nil];
+    NSMutableString *result = [[NSMutableString alloc] init];
+    NSString *temp;
+    NSCharacterSet *newLineAndWhitespaceCharacters = [NSCharacterSet characterSetWithCharactersInString:
+                                                      [NSString stringWithFormat:@" \t\n\r%C%C%C%C", (unsigned short)0x0085, (unsigned short)0x000C, (unsigned short)0x2028, (unsigned short)0x2029]];
+    // Scan
+    while (![scanner isAtEnd]) {
+        
+        // Get non new line or whitespace characters
+        temp = nil;
+        [scanner scanUpToCharactersFromSet:newLineAndWhitespaceCharacters intoString:&temp];
+        if (temp) [result appendString:temp];
+        
+        // Replace with a space
+        if ([scanner scanCharactersFromSet:newLineAndWhitespaceCharacters intoString:NULL]) {
+            if (result.length > 0 && ![scanner isAtEnd]) // Dont append space to beginning or end of result
+                [result appendString:@" "];
+        }
+        
+    }
+    
+    // Cleanup
+    
+    // Return
+    NSString *retString = [NSString stringWithString:result];
+
+    // Return
+    return retString;
+    
+}
+
+// Strip HTML tags
+// DEPRECIATED - Please use NSString stringByConvertingHTMLToPlainText
+- (NSString *)stringByStrippingTagsfromString:(NSString *)string {
+
+    // Find first & and short-cut if we can
+    NSUInteger ampIndex = [string rangeOfString:@"<" options:NSLiteralSearch].location;
+    if (ampIndex == NSNotFound) {
+        return [NSString stringWithString:string]; // return copy of string as no tags found
+    }
+    
+    // Scan and find all tags
+    NSScanner *scanner = [NSScanner scannerWithString:string];
+    [scanner setCharactersToBeSkipped:nil];
+    NSMutableSet *tags = [[NSMutableSet alloc] init];
+    NSString *tag;
+    do {
+        
+        // Scan up to <
+        tag = nil;
+        [scanner scanUpToString:@"<" intoString:NULL];
+        [scanner scanUpToString:@">" intoString:&tag];
+        
+        // Add to set
+        if (tag) {
+            NSString *t = [[NSString alloc] initWithFormat:@"%@>", tag];
+            [tags addObject:t];
+        }
+        
+    } while (![scanner isAtEnd]);
+    
+    // Strings
+    NSMutableString *result = [[NSMutableString alloc] initWithString:string];
+    NSString *finalString;
+    
+    // Replace tags
+    NSString *replacement;
+    for (NSString *t in tags) {
+        
+        // Replace tag with space unless it's an inline element
+        replacement = @" ";
+        if ([t isEqualToString:@"<a>"] ||
+            [t isEqualToString:@"</a>"] ||
+            [t isEqualToString:@"<span>"] ||
+            [t isEqualToString:@"</span>"] ||
+            [t isEqualToString:@"<strong>"] ||
+            [t isEqualToString:@"</strong>"] ||
+            [t isEqualToString:@"<em>"] ||
+            [t isEqualToString:@"</em>"]) {
+            replacement = @"";
+        }
+        // add artificial newline
+        if ([[t stringByReplacingOccurrencesOfString:@" " withString:@""] isEqualToString:@"<br>"]) {
+            replacement = @"___NEW_LINE___";
+        }
+        
+        // Replace
+        [result replaceOccurrencesOfString:t
+                                withString:replacement
+                                   options:NSLiteralSearch
+                                     range:NSMakeRange(0, result.length)];
+    }
+    
+    // Remove multi-spaces and line breaks
+    NSString *strippedString = [self stringByRemovingNewLinesAndWhitespaceFromString:result];
+    
+    // re-add intended line breaks for artificial newlines
+    strippedString = [strippedString stringByReplacingOccurrencesOfString:@"___NEW_LINE___ " withString:@"\n"];
+    strippedString = [strippedString stringByReplacingOccurrencesOfString:@"___NEW_LINE___" withString:@"\n"];
+    
+    // Return
+    return finalString ;
+
+}
 @end
