@@ -24,6 +24,7 @@ extern NSString * const RKSearchWordEntityName;
 extern NSString * const RKSearchWordTokenAttributeName;
 extern NSString * const RKSearchWordOriginalWordAttributeName;
 extern NSString * const RKSearchWordsRelationshipName;
+extern NSString * const RKSearchWordRelationCountAttributeName;
 
 /*
  Defines a Core Data entity for representing searchable text content in a managed object model.

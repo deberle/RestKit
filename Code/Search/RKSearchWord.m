@@ -29,5 +29,33 @@
 
 @dynamic word;
 @dynamic originalWord;
+@dynamic relationCount;
+
+
+- (void)recalculateRelationCount {
+    NSInteger count = 0;
+    for (NSString *relationshipName in [[self.entity relationshipsByName] allKeys]) {
+        id relatitonShipValue = [self valueForKey:relationshipName];
+        count += [relatitonShipValue count];
+    }
+    self.relationCount = @(count);
+}
+
++ (void) load {
+    @autoreleasepool {
+        [[NSNotificationCenter defaultCenter] addObserver: (id)[self class]
+                                                 selector: @selector(objectContextWillSave:)
+                                                     name: NSManagedObjectContextWillSaveNotification
+                                                   object: nil];
+    }
+}
+
++ (void) objectContextWillSave: (NSNotification*) notification {
+    NSManagedObjectContext* context = [notification object];
+    NSSet* allModified = [context.insertedObjects setByAddingObjectsFromSet: context.updatedObjects];
+    NSPredicate* predicate = [NSPredicate predicateWithFormat: @"self isKindOfClass: %@", self];
+    NSSet* modifiable = [allModified filteredSetUsingPredicate: predicate];
+    [modifiable makeObjectsPerformSelector: @selector(recalculateRelationCount)];
+}
 
 @end

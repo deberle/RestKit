@@ -11,6 +11,7 @@
 NSString * const RKSearchWordEntityName = @"RKSearchWord";
 NSString * const RKSearchWordTokenAttributeName = @"word";
 NSString * const RKSearchWordOriginalWordAttributeName = @"originalWord";
+NSString * const RKSearchWordRelationCountAttributeName = @"relationCount";
 
 NSString * const RKSearchWordsRelationshipName = @"searchWords";
 
@@ -30,10 +31,17 @@ NSString * const RKSearchWordsRelationshipName = @"searchWords";
         [originalWordAttribute setName:RKSearchWordOriginalWordAttributeName];
         [originalWordAttribute setIndexed:YES];
         [originalWordAttribute setAttributeType:NSStringAttributeType];
-        [self setProperties:@[tokenAttribute, originalWordAttribute]];
+        NSAttributeDescription *relationshipCountAttribute = [[NSAttributeDescription alloc] init];
+        [relationshipCountAttribute setName:RKSearchWordRelationCountAttributeName];
+        [relationshipCountAttribute setIndexed:YES];
+        [relationshipCountAttribute setAttributeType:NSInteger32AttributeType];
+
+        [self setProperties:@[tokenAttribute, originalWordAttribute, relationshipCountAttribute]];
     }
 
     return self;
 }
+
+
 
 @end

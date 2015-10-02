@@ -39,4 +39,6 @@
 
 @property (nonatomic, strong) NSString *originalWord;
 
+@property (nonatomic, strong) NSNumber *relationCount;
+
 @end
