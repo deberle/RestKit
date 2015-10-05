@@ -505,7 +505,6 @@ NSString * const RKSearchableAttributeNamesUserInfoKey = @"RestKitSearchableAttr
     
     // Strings
     NSMutableString *result = [[NSMutableString alloc] initWithString:string];
-    NSString *finalString;
     
     // Replace tags
     NSString *replacement;
@@ -543,7 +542,7 @@ NSString * const RKSearchableAttributeNamesUserInfoKey = @"RestKitSearchableAttr
     strippedString = [strippedString stringByReplacingOccurrencesOfString:@"___NEW_LINE___" withString:@"\n"];
     
     // Return
-    return finalString ;
+    return strippedString;
 
 }
 @end
