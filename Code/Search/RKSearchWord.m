@@ -58,4 +58,12 @@
     [modifiable makeObjectsPerformSelector: @selector(recalculateRelationCount)];
 }
 
+- (id)valueForUndefinedKey:(NSString *)key {
+    return [super valueForUndefinedKey:key];
+}
+
+- (BOOL)isFavorite {
+    return NO;
+}
+
 @end
